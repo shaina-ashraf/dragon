@@ -16,7 +16,6 @@ try:
 except:
     from transformers import get_constant_schedule, get_constant_schedule_with_warmup,  get_linear_schedule_with_warmup
 import wandb
-
 from modeling import modeling_dragon
 from utils import data_utils
 from utils import optimization_utils
@@ -279,7 +278,7 @@ def train(args, resume, has_test_split, devices, kg):
     grouped_parameters = [
         {'params': [p for n, p in small_lr_params.items() if not any(nd in n for nd in no_decay)], 'weight_decay': args.weight_decay, 'lr': args.encoder_lr},
         {'params': [p for n, p in small_lr_params.items() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0, 'lr': args.encoder_lr},
-        {'params': [p for n, p in large_lr_params.items() if not any(nd in n for nd in no_decay)], 'weight_decay': args.weight_decay, 'lr': args.decoder_lr},
+        #{'params': [p for n, p in lxarge_lr_params.items() if not any(nd in n for nd in no_decay)], 'weight_decay': args.weight_decay, 'lr': args.decoder_lr},
         {'params': [p for n, p in large_lr_params.items() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0, 'lr': args.decoder_lr},
     ]
     optimizer = optimization_utils.OPTIMIZER_CLASSES[args.optim](grouped_parameters)
@@ -636,10 +635,19 @@ def get_devices(args):
 
     return device0, device1
 
+# def get_devices(args):
+#     # Set both device0 and device1 to CPU
+#     device0 = torch.device("cpu")
+#     device1 = torch.device("cpu")
+
+#     # ... rest of the function remains the same ...
+
+#     return device0, device1
 
 
 
 def main(args):
+    print("Inside main2")
     logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(name)s:%(funcName)s():%(lineno)d] %(message)s',
                         datefmt='%m/%d/%Y %H:%M:%S',
                         level=logging.WARNING)
@@ -690,6 +698,8 @@ def main(args):
 
 
 if __name__ == '__main__':
+    
+    print("Inside Main----")
     __spec__ = None
 
     parser = parser_utils.get_parser()

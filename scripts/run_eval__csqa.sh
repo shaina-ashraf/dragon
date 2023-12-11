@@ -29,7 +29,7 @@ seed=5
 lr_schedule=warmup_linear
 warmup_steps=100
 
-n_epochs=22
+n_epochs=2
 max_epochs_before_stop=100
 ie_dim=400
 

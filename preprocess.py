@@ -11,7 +11,6 @@ from preprocess_utils.graph_with_glove import generate_adj_data_from_grounded_co
 from preprocess_utils.graph_with_LM import generate_adj_data_from_grounded_concepts__use_LM
 from preprocess_utils.graph_umls_with_glove import generate_adj_data_from_grounded_concepts_umls__use_glove
 
-
 input_paths = {
     'cpnet': {
         'csv': './data/cpnet/conceptnet-assertions-5.6.0.csv',
