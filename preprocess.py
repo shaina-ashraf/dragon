@@ -31,6 +31,10 @@ input_paths = {
         'dev': './data/obqa/OpenBookQA-V1-Sep2018/Data/Main/dev.jsonl',
         'test': './data/obqa/OpenBookQA-V1-Sep2018/Data/Main/test.jsonl',
     },
+    'fever':{
+        
+        'dev': 'data/fever/feverous_dev_labelled_statements.jsonl'
+    }
 }
 
 
