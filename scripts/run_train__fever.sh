@@ -3,10 +3,9 @@
 #!/bin/bash
 #SBATCH --job-name=sh_dragon
 #SBATCH --partition=short
-#SBATCH --time=00:05:00  # 2 minutes
+#SBATCH --time=00:30:00  # 2 minutes
 #SBATCH --mem=32GB       # 32 GB of RAM
 #SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu:a100:1  # Request 1 a100 GPU
 
 #SBATCH --output=/home/ashrafs/projects/dragon/scripts/logs/%x-%j.log
 #SBATCH --error=/home/ashrafs/projects/dragon/scripts/logs/%x-%j.err
@@ -93,7 +92,7 @@ log=logs/train__${run_name}.log.txt
 cd ..  # Go up one directory to where dragon.py is located
 
 ###### Training ######
-python3 -u dragon2.py \
+python3 -u dragon.py \
     --dataset $dataset \
     --encoder $encoder -k $k --gnn_dim $gnndim -elr $elr -dlr $dlr -bs $bs --seed $seed -mbs ${mbs} --unfreeze_epoch ${unfreeze_epoch} --encoder_layer=${encoder_layer} -sl ${max_seq_len} --max_node_num ${max_node_num} \
     --n_epochs $n_epochs --max_epochs_before_stop ${max_epochs_before_stop} --fp16 $fp16 --upcast $upcast --use_wandb true \

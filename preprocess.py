@@ -32,8 +32,9 @@ input_paths = {
         'test': './data/obqa/OpenBookQA-V1-Sep2018/Data/Main/test.jsonl',
     },
     'fever':{
-        
-        'dev': 'data/fever/feverous_dev_labelled_statements.jsonl'
+        'train': './data/fever/Main/train.jsonl',
+        'dev': './data/fever/Main/dev.jsonl',
+        'test': './data/fever/Main/test.json'
     }
 }
 
@@ -104,6 +105,24 @@ output_paths = {
             'adj-train': './data/obqa/graph/train.graph.adj.pk',
             'adj-dev': './data/obqa/graph/dev.graph.adj.pk',
             'adj-test': './data/obqa/graph/test.graph.adj.pk',
+        },
+    },
+    
+    'fever': {
+        'statement': {
+            'train': './data/fever/statement/train.statement.jsonl',
+            'dev': './data/fever/statement/dev.statement.jsonl',
+            'test': './data/fever/statement/test.statement.jsonl',
+        },
+        'grounded': {
+            'train': './data/fever/grounded/train.grounded.jsonl',
+            'dev': './data/fever/grounded/dev.grounded.jsonl',
+            'test': './data/fever/grounded/test.grounded.jsonl',
+        },
+        'graph': {
+            'adj-train': './data/fever/graph/train.graph.adj.pk',
+            'adj-dev': './data/fever/graph/dev.graph.adj.pk',
+            'adj-test': './data/fever/graph/test.graph.adj.pk',
         },
     },
 }
@@ -197,6 +216,21 @@ def main():
             {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['obqa']['grounded']['train'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['obqa']['graph']['adj-train'], args.nprocs)},
             {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['obqa']['grounded']['dev'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['obqa']['graph']['adj-dev'], args.nprocs)},
             {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['obqa']['grounded']['test'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['obqa']['graph']['adj-test'], args.nprocs)},
+        ],
+        
+         'fever': [
+            {'func': convert_to_entailment, 'args': (input_paths['fever']['train'], output_paths['fever']['statement']['train'])},
+            {'func': convert_to_entailment, 'args': (input_paths['fever']['dev'], output_paths['fever']['statement']['dev'])},
+            {'func': convert_to_entailment, 'args': (input_paths['fever']['test'], output_paths['fever']['statement']['test'])},
+            {'func': ground, 'args': (output_paths['fever']['statement']['train'], output_paths['cpnet']['vocab'],
+                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['train'], args.nprocs)},
+            {'func': ground, 'args': (output_paths['fever']['statement']['dev'], output_paths['cpnet']['vocab'],
+                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['dev'], args.nprocs)},
+            {'func': ground, 'args': (output_paths['fever']['statement']['test'], output_paths['cpnet']['vocab'],
+                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['test'], args.nprocs)},
+            {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['fever']['grounded']['train'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['fever']['graph']['adj-train'], args.nprocs)},
+            {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['fever']['grounded']['dev'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['fever']['graph']['adj-dev'], args.nprocs)},
+            {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['fever']['grounded']['test'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['fever']['graph']['adj-test'], args.nprocs)},
         ],
 
         'medqa': [

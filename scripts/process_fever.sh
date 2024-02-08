@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=sh_dragon
+#SBATCH --job-name=fev_preprocess
 #SBATCH --partition=short
-#SBATCH --time=00:02:00  # 2 minutes
-#SBATCH --mem=4G         # 1 GB of RAM
+#SBATCH --time=1:00:00  
+#SBATCH --mem=32G         # 1 GB of RAM
 #SBATCH --cpus-per-task=1
 #SBATCH --gres=gpu:a100:1  # Request 1 a100 GPU
 
@@ -15,9 +15,14 @@ conda activate dragon2
 
 # Load CUDA module
 module load cuda/11.1
+
+#cd ..  # Go up one directory to where dragon.py is located
+
 # Run your test command
 echo "Starting test run at: $(date)"
 # Replace this with the command to run your script
-# python my_script.py
-bash run_train__fever.sh
+python preprocess.py --run fever
+
+#cd -  # Return to the original directory (optional)
+
 echo "Test run completed at: $(date)"
