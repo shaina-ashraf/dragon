@@ -34,7 +34,7 @@ input_paths = {
     'fever':{
         'train': './data/fever/Main/train.jsonl',
         'dev': './data/fever/Main/dev.jsonl',
-        'test': './data/fever/Main/test.json'
+        'test': './data/fever/Main/test.jsonl'
     }
 }
 
@@ -219,15 +219,16 @@ def main():
         ],
         
          'fever': [
-            {'func': convert_to_entailment, 'args': (input_paths['fever']['train'], output_paths['fever']['statement']['train'])},
-            {'func': convert_to_entailment, 'args': (input_paths['fever']['dev'], output_paths['fever']['statement']['dev'])},
-            {'func': convert_to_entailment, 'args': (input_paths['fever']['test'], output_paths['fever']['statement']['test'])},
-            {'func': ground, 'args': (output_paths['fever']['statement']['train'], output_paths['cpnet']['vocab'],
-                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['train'], args.nprocs)},
-            {'func': ground, 'args': (output_paths['fever']['statement']['dev'], output_paths['cpnet']['vocab'],
-                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['dev'], args.nprocs)},
-            {'func': ground, 'args': (output_paths['fever']['statement']['test'], output_paths['cpnet']['vocab'],
-                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['test'], args.nprocs)},
+            # {'func': convert_to_entailment, 'args': (input_paths['fever']['train'], output_paths['fever']['statement']['train'])},
+            # {'func': convert_to_entailment, 'args': (input_paths['fever']['dev'], output_paths['fever']['statement']['dev'])},
+            # {'func': convert_to_entailment, 'args': (input_paths['fever']['test'], output_paths['fever']['statement']['test'])},
+            # {'func': ground, 'args': (output_paths['fever']['statement']['train'], output_paths['cpnet']['vocab'],
+            #                           output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['train'], args.nprocs)},
+            # {'func': ground, 'args': (output_paths['fever']['statement']['dev'], output_paths['cpnet']['vocab'],
+            #                           output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['dev'], args.nprocs)},
+            # {'func': ground, 'args': (output_paths['fever']['statement']['test'], output_paths['cpnet']['vocab'],
+            #                           output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['test'], args.nprocs)},
+            
             {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['fever']['grounded']['train'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['fever']['graph']['adj-train'], args.nprocs)},
             {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['fever']['grounded']['dev'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['fever']['graph']['adj-dev'], args.nprocs)},
             {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['fever']['grounded']['test'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['fever']['graph']['adj-test'], args.nprocs)},

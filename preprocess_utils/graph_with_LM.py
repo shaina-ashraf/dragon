@@ -39,7 +39,9 @@ def load_resources(cpnet_vocab_path):
 
 def load_cpnet(cpnet_graph_path):
     global cpnet, cpnet_simple
-    cpnet = nx.read_gpickle(cpnet_graph_path)
+    #cpnet = nx.read_gpickle(cpnet_graph_path)
+    with open(cpnet_graph_path, 'rb') as f:
+        cpnet = pickle.load(f) 
     cpnet_simple = nx.Graph()
     for u, v, data in cpnet.edges(data=True):
         w = data['weight'] if 'weight' in data else 1.0

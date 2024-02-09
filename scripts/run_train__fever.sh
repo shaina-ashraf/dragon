@@ -1,10 +1,11 @@
 #!/bin/bash
 
 #!/bin/bash
-#SBATCH --job-name=sh_dragon
+#SBATCH --job-name=fever_train
 #SBATCH --partition=short
-#SBATCH --time=00:30:00  # 2 minutes
-#SBATCH --mem=32GB       # 32 GB of RAM
+#SBATCH --time=1:00:00  
+
+#SBATCH --mem=50GB       # 52 GB of RAM
 #SBATCH --cpus-per-task=1
 
 #SBATCH --output=/home/ashrafs/projects/dragon/scripts/logs/%x-%j.log
@@ -58,7 +59,7 @@ max_seq_len=100
 ent_emb=data/cpnet/tzw.ent.npy
 kg=cpnet
 kg_vocab_path=data/cpnet/concept.txt
-inhouse=true
+inhouse=false
 
 
 info_exchange=true
