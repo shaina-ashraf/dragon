@@ -15,7 +15,7 @@ try:
     from transformers import (ConstantLRSchedule, WarmupLinearSchedule, WarmupConstantSchedule)
 except:
     from transformers import get_constant_schedule, get_constant_schedule_with_warmup,  get_linear_schedule_with_warmup
-#import wandb
+import wandb
 from modeling import modeling_dragon
 from utils import data_utils
 from utils import optimization_utils
@@ -450,15 +450,15 @@ def train(args, resume, has_test_split, devices, kg):
                 ms_per_batch = 1000 * total_time / args.log_interval
                 if args.local_rank in [-1, 0]:
                     print('| step {:5} |  lr: {:9.7f} | total loss {:7.4f} | ms/batch {:7.2f} |'.format(global_step, scheduler.get_lr()[0], total_loss_acm / n_samples_acm, ms_per_batch))
-                    # wandb.log({"lr": scheduler.get_lr()[0],
-                    #             "train_loss": total_loss_acm / n_samples_acm,
-                    #             "train_end_loss": end_loss_acm / n_samples_acm,
-                    #             "train_mlm_loss": mlm_loss_acm / n_samples_acm,
-                    #             "train_link_loss": link_loss_acm / n_samples_acm,
-                    #             "train_pos_link_loss": pos_link_loss_acm / n_samples_acm,
-                    #             "train_neg_link_loss": neg_link_loss_acm / n_samples_acm,
-                    #             "train_acc": n_corrects_acm / n_samples_acm,
-                    #             "ms_per_batch": ms_per_batch}, step=global_step)
+                    wandb.log({"lr": scheduler.get_lr()[0],
+                                "train_loss": total_loss_acm / n_samples_acm,
+                                "train_end_loss": end_loss_acm / n_samples_acm,
+                                "train_mlm_loss": mlm_loss_acm / n_samples_acm,
+                                "train_link_loss": link_loss_acm / n_samples_acm,
+                                "train_pos_link_loss": pos_link_loss_acm / n_samples_acm,
+                                "train_neg_link_loss": neg_link_loss_acm / n_samples_acm,
+                                "train_acc": n_corrects_acm / n_samples_acm,
+                                "ms_per_batch": ms_per_batch}, step=global_step)
 
                 total_loss_acm = end_loss_acm = mlm_loss_acm = 0.0
                 link_loss_acm = pos_link_loss_acm = neg_link_loss_acm = 0.0
@@ -502,9 +502,9 @@ def train(args, resume, has_test_split, devices, kg):
                 with open(log_path, 'a') as fout:
                     fout.write('{:3},{:5},{:7.4f},{:7.4f},{:7.4f},{:7.4f},{:3}\n'.format(epoch_id, global_step, dev_acc, test_acc, best_dev_acc, final_test_acc, best_dev_epoch))
 
-            #wandb.log({"dev_acc": dev_acc, "dev_loss": dev_total_loss, "dev_end_loss": dev_end_loss, "dev_mlm_loss": dev_mlm_loss, "dev_link_loss": dev_link_loss, "dev_pos_link_loss": dev_pos_link_loss, "dev_neg_link_loss": dev_neg_link_loss, "best_dev_acc": best_dev_acc, "best_dev_epoch": best_dev_epoch}, step=global_step)
+            wandb.log({"dev_acc": dev_acc, "dev_loss": dev_total_loss, "dev_end_loss": dev_end_loss, "dev_mlm_loss": dev_mlm_loss, "dev_link_loss": dev_link_loss, "dev_pos_link_loss": dev_pos_link_loss, "dev_neg_link_loss": dev_neg_link_loss, "best_dev_acc": best_dev_acc, "best_dev_epoch": best_dev_epoch}, step=global_step)
             if has_test_split:
-             #   wandb.log({"test_acc": test_acc, "test_loss": test_total_loss, "test_link_loss": test_link_loss, "test_pos_link_loss": test_pos_link_loss, "test_neg_link_loss": test_neg_link_loss, "test_end_loss": test_end_loss, "test_mlm_loss": test_mlm_loss, "final_test_acc": final_test_acc}, step=global_step)
+                wandb.log({"test_acc": test_acc, "test_loss": test_total_loss, "test_link_loss": test_link_loss, "test_pos_link_loss": test_pos_link_loss, "test_neg_link_loss": test_neg_link_loss, "test_end_loss": test_end_loss, "test_mlm_loss": test_mlm_loss, "final_test_acc": final_test_acc}, step=global_step)
                 if args.use_codalab:
                     with open("stats.json", 'w') as fout:
                         json.dump({'epoch': epoch_id, 'step': global_step, 'dev_acc': dev_acc, 'test_acc': test_acc}, fout, indent=2)
@@ -655,12 +655,12 @@ def main(args):
     has_test_split = True
     devices = get_devices(args)
 
-    # if not args.use_wandb:
-    #     wandb_mode = "disabled"
-    # elif args.debug:
-    #     wandb_mode = "offline"
-    # else:
-    #     wandb_mode = "online"
+    if not args.use_wandb:
+        wandb_mode = "disabled"
+    elif args.debug:
+        wandb_mode = "offline"
+    else:
+        wandb_mode = "online"
 
     # We can optionally resume training from a checkpoint. If doing so, also set the `resume_id` so that you resume your previous wandb run instead of creating a new one.
     resume = args.resume_checkpoint not in [None, "None"]
@@ -668,17 +668,17 @@ def main(args):
     args.hf_version = transformers.__version__
 
     if args.local_rank in [-1, 0]:
-        #wandb_id = args.resume_id if resume and (args.resume_id not in [None, "None"]) else wandb.util.generate_id()
-        #args.wandb_id = wandb_id
-        #wandb.init(project="DRAGON", config=args, name=args.run_name, resume="allow", id=wandb_id, settings=wandb.Settings(start_method="fork"), mode=wandb_mode)
+        wandb_id = args.resume_id if resume and (args.resume_id not in [None, "None"]) else wandb.util.generate_id()
+        args.wandb_id = wandb_id
+        wandb.init(project="DRAGON", config=args, name=args.run_name, resume="allow", id=wandb_id, settings=wandb.Settings(start_method="fork"), mode=wandb_mode)
         print(socket.gethostname())
         print ("pid:", os.getpid())
         print ("conda env:", os.environ.get('CONDA_DEFAULT_ENV'))
         print ("screen: %s" % subprocess.check_output('echo $STY', shell=True).decode('utf'))
         print ("gpu: %s" % subprocess.check_output('echo $CUDA_VISIBLE_DEVICES', shell=True).decode('utf'))
         utils.print_cuda_info()
-        #print("wandb id: ", wandb_id)
-        #wandb.run.log_code('.')
+        print("wandb id: ", wandb_id)
+        wandb.run.log_code('.')
 
     kg = args.kg
     if args.dataset == "medqa_usmle":

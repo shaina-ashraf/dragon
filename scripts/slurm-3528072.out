@@ -1,0 +1,8 @@
+Starting pre-processing run at: Thu Feb 15 16:48:25 CET 2024
+Your CPU supports instructions that this binary was not compiled to use: SSE3 SSE4.1 SSE4.2 AVX AVX2
+For maximum performance, you can install NMSLIB from sources 
+pip install --no-binary :all: nmslib
+/var/spool/slurm/d/job3528072/slurm_script: line 33: 1372157 Killed                  python3 preprocess.py --run fever
+/home/ashrafs/projects/dragon/scripts
+Preprocessing run completed at: Thu Feb 15 16:48:54 CET 2024
+slurmstepd: error: Detected 1 oom-kill event(s) in StepId=3528072.batch. Some of your processes may have been killed by the cgroup out-of-memory handler.

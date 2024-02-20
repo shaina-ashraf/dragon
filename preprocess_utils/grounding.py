@@ -297,7 +297,7 @@ def prune(data, cpnet_vocab_path):
             assert len(prune_ac) > 0 and len(prune_qc) > 0
         except Exception as e:
             pass
-            # print("In pruning")
+            print("In pruning")
             # print(prune_qc)
             # print(prune_ac)
             # print("original:")

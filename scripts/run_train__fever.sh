@@ -1,13 +1,12 @@
 #!/bin/bash
 
 #!/bin/bash
-#SBATCH --job-name=fever_train
+#SBATCH --job-name=fever_train_small
 #SBATCH --partition=short
 #SBATCH --time=1:00:00  
 
 #SBATCH --mem=50GB       # 52 GB of RAM
-#SBATCH --cpus-per-task=1
-
+#SBATCH --gres=gpu:1
 #SBATCH --output=/home/ashrafs/projects/dragon/scripts/logs/%x-%j.log
 #SBATCH --error=/home/ashrafs/projects/dragon/scripts/logs/%x-%j.err
 
@@ -47,10 +46,10 @@ encoder_layer=-1
 max_node_num=200
 seed=5
 lr_schedule=warmup_linear
-warmup_steps=2
+warmup_steps=100
 
-n_epochs=2
-max_epochs_before_stop=1
+n_epochs=4
+max_epochs_before_stop=4
 ie_dim=400
 
 
@@ -97,7 +96,7 @@ python3 -u dragon.py \
     --dataset $dataset \
     --encoder $encoder -k $k --gnn_dim $gnndim -elr $elr -dlr $dlr -bs $bs --seed $seed -mbs ${mbs} --unfreeze_epoch ${unfreeze_epoch} --encoder_layer=${encoder_layer} -sl ${max_seq_len} --max_node_num ${max_node_num} \
     --n_epochs $n_epochs --max_epochs_before_stop ${max_epochs_before_stop} --fp16 $fp16 --upcast $upcast --use_wandb true \
-    --save_dir ${save_dir_pref}/${dataset}/${run_name} --save_model 0 \
+    --save_dir ${save_dir_pref}/${dataset}/${run_name} --save_model 1 \
     --run_name ${run_name} \
     --load_model_path $load_model_path \
     --residual_ie $residual_ie \
@@ -107,4 +106,4 @@ python3 -u dragon.py \
 
 cd -  # Return to the original directory (optional)
 
-echo "Test run completed at: $(date)"
+echo "training run completed at: $(date)"
