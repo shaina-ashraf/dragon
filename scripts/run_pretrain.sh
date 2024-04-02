@@ -2,10 +2,10 @@
 
 #!/bin/bash
 #SBATCH --job-name=fever_pretrain
-#SBATCH --partition=short
-#SBATCH --time=1:00:00  
+#SBATCH --partition=owner_fb12
+##SBATCH --time=1:00:00  
 
-#SBATCH --mem=50GB       # 52 GB of RAM
+#SBATCH --mem=60GB       # 52 GB of RAM
 #SBATCH --gres=gpu:1
 
 #SBATCH --output=/home/ashrafs/projects/dragon/scripts/logs/%x-%j.log
@@ -18,11 +18,11 @@ conda activate dragon2
 # Load CUDA module
 module load cuda/11.1
 # Run your test command
-echo "Starting test run at: $(date)"
+echo "Starting Pretrain run at: $(date)"
 
 export CUDA_VISIBLE_DEVICES=0
-export TOKENIZERS_PARALLELISM=true
-export OMP_NUM_THREADS=4
+# export TOKENIZERS_PARALLELISM=true
+# export OMP_NUM_THREADS=4
 dt=`date '+%Y%m%d_%H%M%S'`
 
 
@@ -46,15 +46,15 @@ encoder_layer=-1
 max_node_num=200
 seed=5
 lr_schedule=warmup_linear
-#warmup_steps=100 #orignal
-warmup_steps=2
+warmup_steps=100 #orignal
+#warmup_steps=2
 
 
-#n_epochs=30 #orignal
-n_epochs=2
+n_epochs=30 #orignal
+#n_epochs=2
 
-#max_epochs_before_stop=30 #orignal
-max_epochs_before_stop=2
+max_epochs_before_stop=30 #orignal
+#max_epochs_before_stop=2
 ie_dim=400
 
 
@@ -79,7 +79,7 @@ upcast=true
 
 load_model_path=None
 
-end_task=0
+end_task=1
 mlm_task=1
 link_task=1
 
@@ -124,7 +124,7 @@ python3 -u dragon.py \
     --end_task $end_task --mlm_task $mlm_task --link_task $link_task \
     --mlm_probability $mlmp \
     --link_drop_max_count $ldrpc --link_drop_probability $ldrpp --link_drop_probability_in_which_keep $ldrppk --link_negative_sample_size $negs --link_normalize_headtail $normht --link_proj_headtail $projHT --scaled_distmult $scldstmlt --link_decoder $kgd --link_gamma $gamma \
-    --save_dir ${save_dir_pref}/${dataset}/${run_name} --save_model 2 \
+    --save_dir ${save_dir_pref}/${dataset}/${run_name} --save_model 1 \
     --run_name ${run_name} \
     --load_model_path $load_model_path \
     --residual_ie $residual_ie \
@@ -135,4 +135,4 @@ python3 -u dragon.py \
 
 cd -  # Return to the original directory (optional)
 
-echo "Test run completed at: $(date)"
+echo "Pretrain run completed at: $(date)"

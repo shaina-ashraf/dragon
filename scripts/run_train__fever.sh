@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #!/bin/bash
-#SBATCH --job-name=fever_train_small
-#SBATCH --partition=short
-#SBATCH --time=1:00:00  
+#SBATCH --job-name=fever_train_full
+#SBATCH --partition=owner_fb12
+##SBATCH --time=1:00:00  
 
 #SBATCH --mem=50GB       # 52 GB of RAM
 #SBATCH --gres=gpu:1
@@ -21,8 +21,8 @@ echo "Starting test run at: $(date)"
 
 
 export CUDA_VISIBLE_DEVICES=0
-export TOKENIZERS_PARALLELISM=true
-export OMP_NUM_THREADS=4
+# export TOKENIZERS_PARALLELISM=true
+# export OMP_NUM_THREADS=4
 dt=`date '+%Y%m%d_%H%M%S'`
 
 
@@ -47,9 +47,9 @@ max_node_num=200
 seed=5
 lr_schedule=warmup_linear
 warmup_steps=100
-
-n_epochs=4
-max_epochs_before_stop=4
+    
+n_epochs=22
+max_epochs_before_stop=30
 ie_dim=400
 
 

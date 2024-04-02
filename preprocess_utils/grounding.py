@@ -6,6 +6,7 @@ import os
 import nltk
 import json
 import string
+from datetime import datetime
 
 
 __all__ = ['create_matcher_patterns', 'ground']
@@ -31,6 +32,7 @@ matcher = None
 
 
 def load_cpnet_vocab(cpnet_vocab_path):
+    print("Inside: load_cpnet_vocab:", datetime.now())
     print("Loading cpnet_vocab...")
     with open(cpnet_vocab_path, "r", encoding="utf8") as fin:
         cpnet_vocab = [l.strip() for l in fin]
@@ -40,6 +42,8 @@ def load_cpnet_vocab(cpnet_vocab_path):
 
 
 def create_pattern(nlp, doc, debug=False):
+    print("Inside: create_pattern", datetime.now())
+
     pronoun_list = set(["my", "you", "it", "its", "your", "i", "he", "she", "his", "her", "they", "them", "their", "our", "we"])
     # Filtering concepts consisting of all stop words and longer than four words.
     if len(doc) >= 5 or doc[0].text in pronoun_list or doc[-1].text in pronoun_list or \
@@ -57,6 +61,9 @@ def create_pattern(nlp, doc, debug=False):
 
 
 def create_matcher_patterns(cpnet_vocab_path, output_path, debug=False):
+    
+    print("Inside: create_matcher_patterns", datetime.now())
+
     cpnet_vocab = load_cpnet_vocab(cpnet_vocab_path)
     nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner', 'textcat'])
     docs = nlp.pipe(cpnet_vocab)
@@ -85,6 +92,8 @@ def create_matcher_patterns(cpnet_vocab_path, output_path, debug=False):
 
 def lemmatize(nlp, concept):
 
+    #print("Inside: lemmatize", datetime.now())
+
     doc = nlp(concept.replace("_", " "))
     lcs = set()
     # for i in range(len(doc)):
@@ -101,6 +110,9 @@ def lemmatize(nlp, concept):
 
 
 def load_matcher(nlp, pattern_path):
+    
+    print("Inside: load_matcher", datetime.now())
+
     with open(pattern_path, "r", encoding="utf8") as fin:
         all_patterns = json.load(fin)
 
@@ -112,6 +124,8 @@ def load_matcher(nlp, pattern_path):
 
 
 def ground_qa_pair(qa_pair):
+    print("Inside: ground_qa_pair", datetime.now())
+
     global nlp, matcher
     if nlp is None or matcher is None:
         print("Loading spacy...")
@@ -142,6 +156,8 @@ def ground_qa_pair(qa_pair):
 
 
 def ground_mentioned_concepts(nlp, matcher, s, ans=None):
+
+    print("Inside: ground_mentioned_concepts", datetime.now())
 
     s = s.lower()
     doc = nlp(s)
@@ -229,6 +245,9 @@ def ground_mentioned_concepts(nlp, matcher, s, ans=None):
 
 
 def hard_ground(nlp, sent, cpnet_vocab):
+    
+    print("Inside: hard_ground", datetime.now())
+
     sent = sent.lower()
     doc = nlp(sent)
     res = set()
@@ -246,14 +265,32 @@ def hard_ground(nlp, sent, cpnet_vocab):
 
 
 def match_mentioned_concepts(sents, answers, num_processes):
+    num_processes = 1
+    print("Inside: match_mentioned_concepts", num_processes ,  datetime.now())
     res = []
-    with Pool(num_processes) as p:
-        res = list(tqdm(p.imap(ground_qa_pair, zip(sents, answers)), total=len(sents)))
+    # Prepare the list of (sentence, answer) pairs for processing
+    qa_pairs = list(zip(sents, answers))
+
+    # If num_processes is 1, run in a single process (this might be useful for debugging or environments where multiprocessing is not desired)
+    if num_processes == 1:
+        res = [ground_qa_pair(qa_pair) for qa_pair in tqdm(qa_pairs, total=len(sents))]
+    else:
+        # Use a multiprocessing pool to map ground_qa_pair function over the pairs
+        with Pool(num_processes) as p:
+            res = list(tqdm(p.imap(ground_qa_pair, qa_pairs), total=len(sents)))
+
+    # 
+    # for sent, answer in tqdm(zip(sents, answers), total=len(sents)):
+    #     res.append(ground_qa_pair((sent, answer)))
+    # # with Pool(num_processes) as p:
+    # #     res = list(tqdm(p.imap(ground_qa_pair, zip(sents, answers)), total=len(sents)))
     return res
 
 
 # To-do: examine prune
 def prune(data, cpnet_vocab_path):
+    print("Inside: prune", datetime.now())
+
     # reload cpnet_vocab
     print("Loading cpnet_vocab...")
     with open(cpnet_vocab_path, "r", encoding="utf8") as fin:
@@ -312,6 +349,8 @@ def prune(data, cpnet_vocab_path):
 
 
 def ground(statement_path, cpnet_vocab_path, pattern_path, output_path, num_processes=1, debug=False):
+    print("Inside: ground", datetime.now())
+
     global PATTERN_PATH, CPNET_VOCAB
     if PATTERN_PATH is None:
         PATTERN_PATH = pattern_path
@@ -362,6 +401,8 @@ def ground(statement_path, cpnet_vocab_path, pattern_path, output_path, num_proc
 
 
 if __name__ == "__main__":
+    print("Inside: __main__", datetime.now())
+
     create_matcher_patterns("../data/cpnet/concept.txt", "./matcher_res.txt", True)
     # ground("../data/statement/dev.statement.jsonl", "../data/cpnet/concept.txt", "../data/cpnet/matcher_patterns.json", "./ground_res.jsonl", 10, True)
 

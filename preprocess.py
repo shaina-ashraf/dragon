@@ -10,6 +10,7 @@ from preprocess_utils.graph import generate_adj_data_from_grounded_concepts
 from preprocess_utils.graph_with_glove import generate_adj_data_from_grounded_concepts__use_glove
 from preprocess_utils.graph_with_LM import generate_adj_data_from_grounded_concepts__use_LM
 from preprocess_utils.graph_umls_with_glove import generate_adj_data_from_grounded_concepts_umls__use_glove
+import multiprocessing
 
 input_paths = {
     'cpnet': {
@@ -150,7 +151,9 @@ for dname in ['medqa']:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', default=['common', 'csqa', 'obqa'], nargs='+')
-    parser.add_argument('-p', '--nprocs', type=int, default=cpu_count(), help='number of processes to use')
+    #parser.add_argument('-p', '--nprocs', type=int, default=cpu_count(), help='number of processes to use')
+    default_procs = max(1, int(multiprocessing.cpu_count() / 2))  # Use half of the available CPUs
+    parser.add_argument('-p', '--nprocs', type=int, default=default_procs, help='number of processes to use')
     parser.add_argument('--debug', action='store_true', help='enable debug mode')
 
     args = parser.parse_args()
@@ -222,12 +225,12 @@ def main():
             #{'func': convert_to_entailment, 'args': (input_paths['fever']['train'], output_paths['fever']['statement']['train'])},
             #{'func': convert_to_entailment, 'args': (input_paths['fever']['dev'], output_paths['fever']['statement']['dev'])},
             #{'func': convert_to_entailment, 'args': (input_paths['fever']['test'], output_paths['fever']['statement']['test'])},
-            {'func': ground, 'args': (output_paths['fever']['statement']['train'], output_paths['cpnet']['vocab'],
-                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['train'], args.nprocs)},
-            {'func': ground, 'args': (output_paths['fever']['statement']['dev'], output_paths['cpnet']['vocab'],
-                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['dev'], args.nprocs)},
-            {'func': ground, 'args': (output_paths['fever']['statement']['test'], output_paths['cpnet']['vocab'],
-                                      output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['test'], args.nprocs)},
+            #{'func': ground, 'args': (output_paths['fever']['statement']['train'], output_paths['cpnet']['vocab'],
+            #                          output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['train'], args.nprocs)},
+            #{'func': ground, 'args': (output_paths['fever']['statement']['dev'], output_paths['cpnet']['vocab'],
+            #                          output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['dev'], args.nprocs)},
+            #{'func': ground, 'args': (output_paths['fever']['statement']['test'], output_paths['cpnet']['vocab'],
+            #                          output_paths['cpnet']['patterns'], output_paths['fever']['grounded']['test'], args.nprocs)},
             
             {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['fever']['grounded']['train'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['fever']['graph']['adj-train'], args.nprocs)},
             {'func': generate_adj_data_from_grounded_concepts__use_LM, 'args': (output_paths['fever']['grounded']['dev'], output_paths['cpnet']['pruned-graph'], output_paths['cpnet']['vocab'], output_paths['fever']['graph']['adj-dev'], args.nprocs)},
